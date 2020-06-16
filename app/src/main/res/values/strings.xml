@@ -4,6 +4,7 @@
     <!-- List Item -->
     <string name="database_name_room">Room</string>
     <string name="database_name_realm">Realm</string>
+    <string name="database_name_ormLite">OrmLite</string>
     <string name="database_name_objectBox">Object Box</string>
 
     <string name="database_last_date_run">Last Date Run : </string>

@@ -24,6 +24,7 @@ import com.psilva.apptest.R
 import com.psilva.apptest.adapters.ListAdapter
 import com.psilva.apptest.databases.enums.DatabaseEnum
 import com.psilva.apptest.databases.interfaces.IPerformanceTestListener
+import kotlinx.android.synthetic.main.bottom_sheet_custom_view.*
 import kotlinx.android.synthetic.main.main_fragment.view.*
 
 class MainFragment : Fragment(), IPerformanceTestListener {
@@ -41,7 +42,6 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-
         _view = inflater.inflate(R.layout.main_fragment, container, false)
 
         _viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -168,14 +168,15 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
     // bind databases to test
     private fun bindDatabases(customView: View) {
-
         val cbDatabaseRoomChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRoom)
         val cbDatabaseRealmChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRealm)
+        val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
 
         _viewModel.getDatabaseListToTest().forEach {
             when(it.key) {
                 DatabaseEnum.ROOM -> cbDatabaseRoomChecked.isChecked = true
                 DatabaseEnum.REALM -> cbDatabaseRealmChecked.isChecked = true
+                DatabaseEnum.ORMLITE -> cbDatabaseOrmLiteChecked.isChecked = true
             }
         }
     }
@@ -196,6 +197,10 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
         val cbDatabaseRoomChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRoom)
         val cbDatabaseRealmChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRealm)
+        val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
+
+
+
 
         var databaseList = _viewModel.getDatabaseListToTest()
         var databaseListToAdd = mutableListOf<DatabaseEnum>()
@@ -217,6 +222,17 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
         if(!cbDatabaseRealmChecked.isChecked && databaseList.contains(DatabaseEnum.REALM)) {
             databaseList.remove(DatabaseEnum.REALM)
+        }
+
+
+
+
+        if(cbDatabaseOrmLiteChecked.isChecked && !databaseList.contains(DatabaseEnum.ORMLITE)) {
+            databaseListToAdd.add(DatabaseEnum.ORMLITE)
+        }
+
+        if(!cbDatabaseOrmLiteChecked.isChecked && databaseList.contains(DatabaseEnum.ORMLITE)) {
+            databaseList.remove(DatabaseEnum.ORMLITE)
         }
 
         _viewModel.submitParameters(testRunQty.text.toString().toLong(), testRunQtyData.text.toString().toLong(), testType.selectedItem.toString(), databaseListToAdd)

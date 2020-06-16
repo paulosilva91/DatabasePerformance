@@ -146,7 +146,7 @@
             android:id="@+id/cbDatabaseRoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="@string/database_name_room"
             android:textColor="?android:textColorPrimary"
@@ -156,10 +156,21 @@
             android:id="@+id/cbDatabaseRealm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/cbDatabaseRoom"
             android:gravity="center"
             android:text="@string/database_name_realm"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+
+        <CheckBox
+            android:id="@+id/cbDatabaseOrmLite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/cbDatabaseRealm"
+            android:gravity="center"
+            android:text="@string/database_name_ormLite"
             android:textColor="?android:textColorPrimary"
             android:textSize="@dimen/bottom_sheet_custom_view_edit" />
 

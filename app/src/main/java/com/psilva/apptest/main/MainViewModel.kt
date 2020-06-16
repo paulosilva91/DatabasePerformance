@@ -10,6 +10,7 @@ import com.psilva.apptest.databases.enums.DatabaseOperationEnum
 import com.psilva.apptest.databases.enums.DatabaseOperationTypeEnum
 import com.psilva.apptest.databases.interfaces.IPerformanceTestListener
 import com.psilva.apptest.databases.interfaces.IPerformanceTestResultListener
+import com.psilva.apptest.databases.ormlite.DataLoaderOrmLite
 import com.psilva.apptest.databases.realm.DataLoaderRealm
 import com.psilva.apptest.databases.room.DataLoaderRoom
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +77,7 @@ class MainViewModel : MainBaseObservableViewModel(),
             when (database) {
                 DatabaseEnum.ROOM -> { executeRoomTest(context) }
                 DatabaseEnum.REALM -> { executeRealmTest(context) }
+                DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
             }
 
             queueIterator.remove()
@@ -144,6 +146,10 @@ class MainViewModel : MainBaseObservableViewModel(),
 
     private suspend fun executeRealmTest(context: Context) {
         DataLoaderRealm(context, this).execute(_quantityTestData)
+    }
+
+    private suspend fun executeOrmLiteTest(context: Context) {
+        DataLoaderOrmLite(context, this).execute(_quantityTestData)
     }
 
 }

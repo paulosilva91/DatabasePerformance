@@ -66,13 +66,13 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
     }
 
     suspend fun updateData() {
-        UPDATE_DATA.startTiming()
-
         for (i in _data.indices) {
             _data[i].stringValue = i.toString()
             _data[i].intValue = generateInt()
             _data[i].longValue = generateLong()
         }
+
+        UPDATE_DATA.startTiming()
 
         _room.getDataRoomDao().update(_data.asList())
 
@@ -88,7 +88,7 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
     }
 
     fun generateData(index : Long) : DataRoom {
-        return DataRoom(index, generateString(), generateInt(), generateLong())
+        return DataRoom(index + 1, generateString(), generateInt(), generateLong())
     }
 
     private fun onProcessSuccess(databaseOperationEnum: DatabaseOperationEnum) {
