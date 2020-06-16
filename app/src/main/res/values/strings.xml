@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Database Performance</string>
+
+    <!-- List Item -->
+    <string name="database_name_room">Room</string>
+    <string name="database_name_realm">Realm</string>
+    <string name="database_name_objectBox">Object Box</string>
+
+    <string name="database_last_date_run">Last Date Run : </string>
+    <string name="database_create_time">Create Time (ms) : </string>
+    <string name="database_read_time">Read Time (ms) : </string>
+    <string name="database_update_time">Update Time (ms) : </string>
+    <string name="database_delete_time">Delete Time (ms) : </string>
+    <string name="menu_options_title">Performance Test Parameters</string>
+    <string name="alert_dialog_submit_button">Submit</string>
+
+</resources>
