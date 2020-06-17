@@ -37,8 +37,7 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
         return Timings(TAG)
     }
 
-
-    suspend fun execute(size: Long) {
+    public override suspend fun execute(size: Long) {
         val list: MutableList<DataOrmLite> = mutableListOf<DataOrmLite>()
         for (i in 0 until size) {
             list.add(generateData(i))
@@ -51,25 +50,35 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
     }
 
 
-    suspend fun createData(list: MutableList<DataOrmLite>) {
+    private suspend fun createData(list: MutableList<DataOrmLite>) {
         CREATE_DATA.startTiming()
 
-        for (item in list) {
-            _ormLite.create(item)
+        try {
+            for (item in list) {
+                _ormLite.create(item)
+            }
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.CREATE, ex)
         }
 
         onProcessSuccess(DatabaseOperationEnum.CREATE)
     }
 
-    suspend fun readData() {
+    private suspend fun readData() {
         READ_DATA.startTiming()
 
-        _data = _ormLite.queryForAll()
+        try {
+            _data = _ormLite.queryForAll()
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.READ, ex)
+        }
 
         onProcessSuccess(DatabaseOperationEnum.READ)
     }
 
-    suspend fun updateData() {
+    private suspend fun updateData() {
         for (i in _data.indices) {
             _data[i].stringValue = i.toString()
             _data[i].intValue = generateInt()
@@ -78,28 +87,42 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
 
         UPDATE_DATA.startTiming()
 
-        for (item in _data) {
-            _ormLite.update(item)
+        try {
+            for (item in _data) {
+                _ormLite.update(item)
+            }
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.UPDATE, ex)
         }
 
         onProcessSuccess(DatabaseOperationEnum.UPDATE)
     }
 
-    suspend fun deleteData() {
+    private suspend fun deleteData() {
         DELETE_DATA.startTiming()
 
-        for (item in _data) {
-            _ormLite.delete(item)
+        try {
+            for (item in _data) {
+                _ormLite.delete(item)
+            }
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.DELETE, ex)
         }
 
         onProcessSuccess(DatabaseOperationEnum.DELETE)
     }
 
-    fun generateData(index : Long) : DataOrmLite {
+    private fun generateData(index : Long) : DataOrmLite {
         return DataOrmLite(index + 1, generateString(), generateInt(), generateLong())
     }
 
     private fun onProcessSuccess(databaseOperationEnum: DatabaseOperationEnum) {
         _databasePerformanceTestResultListener.onResultTimeSuccess(CURRENT_DB_ENUM, databaseOperationEnum, stopTiming())
+    }
+
+    private fun onProcessError(databaseOperationEnum: DatabaseOperationEnum, exception: Exception) {
+        _databasePerformanceTestResultListener.onResultError(CURRENT_DB_ENUM, databaseOperationEnum, stopTiming(), exception)
     }
 }

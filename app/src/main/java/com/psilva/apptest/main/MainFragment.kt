@@ -171,12 +171,14 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         val cbDatabaseRoomChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRoom)
         val cbDatabaseRealmChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRealm)
         val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
+        val cbDatabaseCouchbaseChecked: CheckBox = customView.findViewById(R.id.cbDatabaseCouchbase)
 
         _viewModel.getDatabaseListToTest().forEach {
             when(it.key) {
                 DatabaseEnum.ROOM -> cbDatabaseRoomChecked.isChecked = true
                 DatabaseEnum.REALM -> cbDatabaseRealmChecked.isChecked = true
                 DatabaseEnum.ORMLITE -> cbDatabaseOrmLiteChecked.isChecked = true
+                DatabaseEnum.COUCHBASE -> cbDatabaseCouchbaseChecked.isChecked = true
             }
         }
     }
@@ -198,6 +200,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         val cbDatabaseRoomChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRoom)
         val cbDatabaseRealmChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRealm)
         val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
+        val cbDatabaseCouchbaseChecked: CheckBox = customView.findViewById(R.id.cbDatabaseCouchbase)
 
 
 
@@ -233,6 +236,14 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
         if(!cbDatabaseOrmLiteChecked.isChecked && databaseList.contains(DatabaseEnum.ORMLITE)) {
             databaseList.remove(DatabaseEnum.ORMLITE)
+        }
+
+        if(cbDatabaseCouchbaseChecked.isChecked && !databaseList.contains(DatabaseEnum.COUCHBASE)) {
+            databaseListToAdd.add(DatabaseEnum.COUCHBASE)
+        }
+
+        if(!cbDatabaseCouchbaseChecked.isChecked && databaseList.contains(DatabaseEnum.COUCHBASE)) {
+            databaseList.remove(DatabaseEnum.COUCHBASE)
         }
 
         _viewModel.submitParameters(testRunQty.text.toString().toLong(), testRunQtyData.text.toString().toLong(), testType.selectedItem.toString(), databaseListToAdd)

@@ -10,6 +10,8 @@ abstract class BaseLoader<T> {
 
     protected abstract fun createTimingLogger(): Timings
 
+    protected abstract suspend fun execute(size: Long)
+
     companion object {
         val CREATE_DATA = "Create"
         val UPDATE_DATA = "Update"

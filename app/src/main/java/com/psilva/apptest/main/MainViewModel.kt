@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.psilva.apptest.databases.couchbase.DataLoaderCouchbase
 import com.psilva.apptest.databases.enums.DatabaseEnum
 import com.psilva.apptest.databases.enums.DatabaseOperationEnum
 import com.psilva.apptest.databases.enums.DatabaseOperationTypeEnum
@@ -39,6 +40,9 @@ class MainViewModel : MainBaseObservableViewModel(),
         onProcessResult(databaseEnum, databaseOperationEnum, time)
     }
 
+    override fun onResultError(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, time: Long, exception: Exception) {
+        onProcessResultError(databaseEnum, databaseOperationEnum, time, exception)
+    }
 
 
 
@@ -78,6 +82,7 @@ class MainViewModel : MainBaseObservableViewModel(),
                 DatabaseEnum.ROOM -> { executeRoomTest(context) }
                 DatabaseEnum.REALM -> { executeRealmTest(context) }
                 DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
+                DatabaseEnum.COUCHBASE -> { executeCouchbaseTest(context) }
             }
 
             queueIterator.remove()
@@ -140,6 +145,13 @@ class MainViewModel : MainBaseObservableViewModel(),
         data.postValue(_resultDataMap.values)
     }
 
+    private fun onProcessResultError(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, time: Long, exception: Exception) {
+        //TODO
+        val a = 1
+    }
+
+
+
     private suspend fun executeRoomTest(context: Context) {
         DataLoaderRoom(context, this).execute(_quantityTestData)
     }
@@ -150,6 +162,10 @@ class MainViewModel : MainBaseObservableViewModel(),
 
     private suspend fun executeOrmLiteTest(context: Context) {
         DataLoaderOrmLite(context, this).execute(_quantityTestData)
+    }
+
+    private suspend fun executeCouchbaseTest(context: Context) {
+        DataLoaderCouchbase(context, this).execute(_quantityTestData)
     }
 
 }

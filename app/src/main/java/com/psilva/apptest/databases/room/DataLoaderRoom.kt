@@ -34,8 +34,7 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
         return Timings(TAG)
     }
 
-    //separate by threads
-    suspend fun execute(size: Long) {
+    public override suspend fun execute(size: Long) {
         val list: MutableList<DataRoom> = mutableListOf<DataRoom>()
         for (i in 0 until size) {
             list.add(generateData(i))
@@ -49,23 +48,34 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
         deleteData()
     }
 
-    suspend fun createData(list: MutableList<DataRoom>) {
+
+
+    private suspend fun createData(list: MutableList<DataRoom>) {
         CREATE_DATA.startTiming()
 
-        _room.getDataRoomDao().insertAll(list)
-
+        try {
+            _room.getDataRoomDao().insertAll(list)
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.CREATE, ex)
+        }
         onProcessSuccess(DatabaseOperationEnum.CREATE)
     }
 
-    suspend fun readData() {
+    private suspend fun readData() {
         READ_DATA.startTiming()
 
-        _data = _room.getDataRoomDao().getAll()
+        try {
+            _data = _room.getDataRoomDao().getAll()
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.READ, ex)
+        }
 
         onProcessSuccess(DatabaseOperationEnum.READ)
     }
 
-    suspend fun updateData() {
+    private suspend fun updateData() {
         for (i in _data.indices) {
             _data[i].stringValue = i.toString()
             _data[i].intValue = generateInt()
@@ -74,24 +84,38 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
 
         UPDATE_DATA.startTiming()
 
-        _room.getDataRoomDao().update(_data.asList())
+        try {
+            _room.getDataRoomDao().update(_data.asList())
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.UPDATE, ex)
+        }
 
         onProcessSuccess(DatabaseOperationEnum.UPDATE)
     }
 
-    suspend fun deleteData() {
+    private suspend fun deleteData() {
         DELETE_DATA.startTiming()
 
-        _room.getDataRoomDao().deleteAll()
+        try {
+            _room.getDataRoomDao().deleteAll()
+        }
+        catch (ex: Exception) {
+            onProcessError(DatabaseOperationEnum.DELETE, ex)
+        }
 
         onProcessSuccess(DatabaseOperationEnum.DELETE)
     }
 
-    fun generateData(index : Long) : DataRoom {
+    private fun generateData(index : Long) : DataRoom {
         return DataRoom(index + 1, generateString(), generateInt(), generateLong())
     }
 
     private fun onProcessSuccess(databaseOperationEnum: DatabaseOperationEnum) {
         _databasePerformanceTestResultListener.onResultTimeSuccess(CURRENT_DB_ENUM, databaseOperationEnum, stopTiming())
+    }
+
+    private fun onProcessError(databaseOperationEnum: DatabaseOperationEnum, exception: Exception) {
+        _databasePerformanceTestResultListener.onResultError(CURRENT_DB_ENUM, databaseOperationEnum, stopTiming(), exception)
     }
 }
