@@ -4,5 +4,6 @@ enum class DatabaseEnum {
     ROOM,
     REALM,
     ORMLITE,
-    COUCHBASE
+    COUCHBASE,
+    SQLITE
 }

@@ -185,6 +185,17 @@
             android:textColor="?android:textColorPrimary"
             android:textSize="@dimen/bottom_sheet_custom_view_edit" />
 
+        <CheckBox
+            android:id="@+id/cbDatabaseSqlite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/cbDatabaseCouchbase"
+            android:gravity="center"
+            android:text="@string/database_name_sqlite"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+
     </RelativeLayout>
 
 </LinearLayout>

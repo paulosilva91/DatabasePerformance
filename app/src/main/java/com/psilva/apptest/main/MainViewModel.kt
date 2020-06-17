@@ -14,6 +14,7 @@ import com.psilva.apptest.databases.interfaces.IPerformanceTestResultListener
 import com.psilva.apptest.databases.ormlite.DataLoaderOrmLite
 import com.psilva.apptest.databases.realm.DataLoaderRealm
 import com.psilva.apptest.databases.room.DataLoaderRoom
+import com.psilva.apptest.databases.sqlite.DataLoaderSqlite
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -83,6 +84,7 @@ class MainViewModel : MainBaseObservableViewModel(),
                 DatabaseEnum.REALM -> { executeRealmTest(context) }
                 DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
                 DatabaseEnum.COUCHBASE -> { executeCouchbaseTest(context) }
+                DatabaseEnum.SQLITE -> { executeSQLiteTest(context) }
             }
 
             queueIterator.remove()
@@ -166,6 +168,10 @@ class MainViewModel : MainBaseObservableViewModel(),
 
     private suspend fun executeCouchbaseTest(context: Context) {
         DataLoaderCouchbase(context, this).execute(_quantityTestData)
+    }
+
+    private suspend fun executeSQLiteTest(context: Context) {
+        DataLoaderSqlite(context, this).execute(_quantityTestData)
     }
 
 }

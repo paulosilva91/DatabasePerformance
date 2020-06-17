@@ -41,7 +41,7 @@ class DataLoaderCouchbase(context: Context, databasePerformanceTestResultListene
     }
 
     public override suspend fun execute(size: Long) {
-        var list: MutableList<MutableDocument> = ArrayList(size.toInt())
+        val list: MutableList<MutableDocument> = ArrayList(size.toInt())
 
         for (i in 0 until size) {
             list.add(generateData(i))

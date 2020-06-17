@@ -89,6 +89,7 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
         }
         catch (ex: Exception) {
             onProcessError(DatabaseOperationEnum.CREATE, ex)
+            return
         }
 
         onProcessSuccess(DatabaseOperationEnum.CREATE)
@@ -109,6 +110,7 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
         }
         catch (ex: Exception) {
             onProcessError(DatabaseOperationEnum.READ, ex)
+            return
         }
 
         onProcessSuccess(DatabaseOperationEnum.READ)
@@ -129,6 +131,7 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
         }
         catch (ex: Exception) {
             onProcessError(DatabaseOperationEnum.UPDATE, ex)
+            return
         }
 
         onProcessSuccess(DatabaseOperationEnum.UPDATE)
@@ -144,6 +147,7 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
         }
         catch (ex: Exception) {
             onProcessError(DatabaseOperationEnum.DELETE, ex)
+            return
         }
 
         onProcessSuccess(DatabaseOperationEnum.DELETE)

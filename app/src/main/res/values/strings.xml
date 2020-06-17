@@ -15,5 +15,6 @@
     <string name="database_delete_time">Delete Time (ms) : </string>
     <string name="menu_options_title">Performance Test Parameters</string>
     <string name="alert_dialog_submit_button">Submit</string>
+    <string name="database_name_sqlite">SQLite</string>
 
 </resources>

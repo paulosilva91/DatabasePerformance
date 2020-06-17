@@ -172,6 +172,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         val cbDatabaseRealmChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRealm)
         val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
         val cbDatabaseCouchbaseChecked: CheckBox = customView.findViewById(R.id.cbDatabaseCouchbase)
+        val cbDatabaseSQLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseSqlite)
 
         _viewModel.getDatabaseListToTest().forEach {
             when(it.key) {
@@ -179,6 +180,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
                 DatabaseEnum.REALM -> cbDatabaseRealmChecked.isChecked = true
                 DatabaseEnum.ORMLITE -> cbDatabaseOrmLiteChecked.isChecked = true
                 DatabaseEnum.COUCHBASE -> cbDatabaseCouchbaseChecked.isChecked = true
+                DatabaseEnum.SQLITE -> cbDatabaseSQLiteChecked.isChecked = true
             }
         }
     }
@@ -201,6 +203,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         val cbDatabaseRealmChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRealm)
         val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
         val cbDatabaseCouchbaseChecked: CheckBox = customView.findViewById(R.id.cbDatabaseCouchbase)
+        val cbDatabaseSQLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseSqlite)
 
 
 
@@ -245,6 +248,17 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         if(!cbDatabaseCouchbaseChecked.isChecked && databaseList.contains(DatabaseEnum.COUCHBASE)) {
             databaseList.remove(DatabaseEnum.COUCHBASE)
         }
+
+
+        if(cbDatabaseSQLiteChecked.isChecked && !databaseList.contains(DatabaseEnum.SQLITE)) {
+            databaseListToAdd.add(DatabaseEnum.SQLITE)
+        }
+
+        if(!cbDatabaseSQLiteChecked.isChecked && databaseList.contains(DatabaseEnum.SQLITE)) {
+            databaseList.remove(DatabaseEnum.SQLITE)
+        }
+
+
 
         _viewModel.submitParameters(testRunQty.text.toString().toLong(), testRunQtyData.text.toString().toLong(), testType.selectedItem.toString(), databaseListToAdd)
 
