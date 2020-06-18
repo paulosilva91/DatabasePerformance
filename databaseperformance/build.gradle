@@ -5,12 +5,12 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.0"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
-        minSdkVersion 22
-        targetSdkVersion 29
+        minSdkVersion 24
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -30,8 +30,8 @@ android {
 
     // Set minimum JVM level to ensure availability of, for example, lambda expressions
     compileOptions {
-        targetCompatibility = '1.8'
-        sourceCompatibility = '1.8'
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
 }

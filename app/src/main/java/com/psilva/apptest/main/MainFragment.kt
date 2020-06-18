@@ -93,7 +93,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
     private fun enableButtons() {
         _view.fbRefreshScan.isEnabled = true
-        _view.bottomAppBar.navigationIcon = resources.getDrawable(R.drawable.ic_menu_white_24dp)
+        _view.bottomAppBar.navigationIcon = resources.getDrawable(R.drawable.ic_menu_white_24dp, null)
     }
 
     private fun showProgressBar() {

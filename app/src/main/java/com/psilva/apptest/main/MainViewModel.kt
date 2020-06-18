@@ -40,8 +40,8 @@ class MainViewModel : MainBaseObservableViewModel(),
         onProcessResult(databaseEnum, databaseOperationEnum, time)
     }
 
-    override fun onResultError(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, time: Long, exception: Exception) {
-        onProcessResultError(databaseEnum, databaseOperationEnum, time, exception)
+    override fun onResultError(currentDbEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, stopTiming: Long, exception: Exception) {
+        onProcessResultError(currentDbEnum, databaseOperationEnum, stopTiming, exception)
     }
 
 
@@ -59,7 +59,6 @@ class MainViewModel : MainBaseObservableViewModel(),
             catch (e: Exception) {
                 //TODO
                 //error
-                val error = 1
             }
         }
     }
@@ -77,15 +76,15 @@ class MainViewModel : MainBaseObservableViewModel(),
         val queueIterator = _databaseQeue.iterator()
         while (queueIterator.hasNext()) {
             val database = queueIterator.next()
-
-            when (database) {
-                DatabaseEnum.ROOM -> { executeRoomTest(context) }
-                DatabaseEnum.REALM -> { executeRealmTest(context) }
-                DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
-                DatabaseEnum.COUCHBASE -> { executeCouchbaseTest(context) }
-                DatabaseEnum.SQLITE -> { executeSQLiteTest(context) }
+            if(database != null) {
+                when (database) {
+                    DatabaseEnum.ROOM -> { executeRoomTest(context) }
+                    DatabaseEnum.REALM -> { executeRealmTest(context) }
+                    DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
+                    DatabaseEnum.COUCHBASE -> { executeCouchbaseTest(context) }
+                    DatabaseEnum.SQLITE -> { executeSQLiteTest(context) }
+                }
             }
-
             queueIterator.remove()
         }
 
@@ -148,7 +147,6 @@ class MainViewModel : MainBaseObservableViewModel(),
 
     private fun onProcessResultError(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, time: Long, exception: Exception) {
         //TODO
-        val a = 1
     }
 
 

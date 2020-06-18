@@ -43,24 +43,20 @@ abstract class BaseLoader<T> {
     }
 
     protected fun onProcessSuccess(databaseTypeEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum) {
-        if(_databasePerformanceTestResultListener != null) {
-            _databasePerformanceTestResultListener.onResultTimeSuccess(
-                databaseTypeEnum,
-                databaseOperationEnum,
-                stopTiming()
-            )
-        }
+        _databasePerformanceTestResultListener.onResultTimeSuccess(
+            databaseTypeEnum,
+            databaseOperationEnum,
+            stopTiming()
+        )
     }
 
     protected fun onProcessError(databaseTypeEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, exception: Exception) {
-        if(_databasePerformanceTestResultListener != null) {
-            _databasePerformanceTestResultListener.onResultError(
-                databaseTypeEnum,
-                databaseOperationEnum,
-                stopTiming(),
-                exception
-            )
-        }
+        _databasePerformanceTestResultListener.onResultError(
+            databaseTypeEnum,
+            databaseOperationEnum,
+            stopTiming(),
+            exception
+        )
     }
 
 
