@@ -1,2 +1,3 @@
 rootProject.name='AppTest'
 include ':app'
+include ':databaseperformance'

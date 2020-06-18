@@ -1,6 +1,6 @@
 package com.psilva.apptest.main
 
-import com.psilva.apptest.databases.enums.DatabaseEnum
+import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import java.util.*
 
 data class ResultDataModel(

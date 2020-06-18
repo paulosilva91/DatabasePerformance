@@ -22,8 +22,8 @@ import com.psilva.apptest.R
 
 
 import com.psilva.apptest.adapters.ListAdapter
-import com.psilva.apptest.databases.enums.DatabaseEnum
-import com.psilva.apptest.databases.interfaces.IPerformanceTestListener
+import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
+import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestListener
 import kotlinx.android.synthetic.main.bottom_sheet_custom_view.*
 import kotlinx.android.synthetic.main.main_fragment.view.*
 

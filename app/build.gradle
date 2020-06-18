@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'realm-android'
 
 android {
     dataBinding {
@@ -28,16 +27,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    // Required only if your project has some Kotlin source code
-    kotlinOptions { jvmTarget = '1.8' }
-
-    // Set minimum JVM level to ensure availability of, for example, lambda expressions
-    compileOptions {
-        targetCompatibility = '1.8'
-        sourceCompatibility = '1.8'
-    }
-
 }
 
 dependencies {
@@ -79,18 +68,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:2.1.0"
     implementation "com.squareup.retrofit2:adapter-rxjava2:2.4.0"
 
-    //Room
-    implementation "androidx.room:room-runtime:$version_room"
-    implementation "androidx.room:room-ktx:$version_room"
-    kapt "androidx.room:room-compiler:$version_room"
-
-    //ORM Lite
-    implementation "com.j256.ormlite:ormlite-android:$version_ormlite"
-    implementation "com.j256.ormlite:ormlite-core:$version_ormlite"
-
-    //Couchbase
-    implementation "com.couchbase.lite:couchbase-lite-android-ee:$version_couchbase"
-
     //Material Dialog
     implementation "com.afollestad.material-dialogs:bottomsheets:3.3.0"
+    implementation project(path: ':databaseperformance')
 }

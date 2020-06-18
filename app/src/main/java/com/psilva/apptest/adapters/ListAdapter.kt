@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.psilva.apptest.R
 import com.psilva.apptest.main.ResultDataModel
-import com.psilva.apptest.databases.enums.DatabaseEnum
+import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import kotlinx.android.synthetic.main.list_item.view.*
 import java.text.SimpleDateFormat
 import java.util.*
