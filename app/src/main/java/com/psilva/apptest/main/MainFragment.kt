@@ -1,15 +1,18 @@
 package com.psilva.apptest.main
 
+
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,13 +21,13 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
-import com.psilva.apptest.R
-
-
-import com.psilva.apptest.adapters.ListAdapter
+import com.google.android.material.snackbar.Snackbar
 import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
+import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationEnum
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestListener
-import kotlinx.android.synthetic.main.bottom_sheet_custom_view.*
+import com.psilva.android.databaseperformance.databases.utils.AndroidPermissions
+import com.psilva.apptest.R
+import com.psilva.apptest.adapters.ListAdapter
 import kotlinx.android.synthetic.main.main_fragment.view.*
 
 class MainFragment : Fragment(), IPerformanceTestListener {
@@ -51,19 +54,49 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         return _view
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         _context = context
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.main_fragment_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_export_csv_action -> {
+                requestPermissionToWrite()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> _viewModel.onExportCSVClicked(_context)
+        }
+    }
 
 
+    private fun requestPermissionToWrite() {
+        //Check permissions
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE
+            )
+        } else {
+            // got permission use it
+            _viewModel.onExportCSVClicked(_context)
+        }
     }
 
 
@@ -82,8 +115,9 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         enableButtons()
     }
 
-
-
+    override fun onPerformanceTestError(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, exception: Exception) {
+        Snackbar.make(_view.rvResultList, String.format(getString(R.string.database_error_message), databaseOperationEnum, databaseEnum), Snackbar.LENGTH_LONG)
+    }
 
 
     private fun disableButtons() {
@@ -208,8 +242,8 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
 
 
-        var databaseList = _viewModel.getDatabaseListToTest()
-        var databaseListToAdd = mutableListOf<DatabaseEnum>()
+        val databaseList = _viewModel.getDatabaseListToTest()
+        val databaseListToAdd = mutableListOf<DatabaseEnum>()
 
 
 

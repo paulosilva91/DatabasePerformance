@@ -17,4 +17,10 @@
     <string name="alert_dialog_submit_button">Submit</string>
     <string name="database_name_sqlite">SQLite</string>
 
+
+
+
+    <string name="database_error_message" formatted="false">An error occurred when testing the %1$s operation in the DB %2$s</string>
+    <string name="menu_export_csv">Export CSV</string>
+
 </resources>

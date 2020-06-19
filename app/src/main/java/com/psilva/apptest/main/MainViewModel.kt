@@ -8,12 +8,14 @@ import com.psilva.android.databaseperformance.databases.implementations.couchbas
 import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationTypeEnum
+import com.psilva.android.databaseperformance.databases.export.csv.CSVFile
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestListener
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestResultListener
 import com.psilva.android.databaseperformance.databases.implementations.ormlite.DataLoaderOrmLite
 import com.psilva.android.databaseperformance.databases.implementations.realm.DataLoaderRealm
 import com.psilva.android.databaseperformance.databases.implementations.room.DataLoaderRoom
 import com.psilva.android.databaseperformance.databases.implementations.sqlite.DataLoaderSqlite
+import com.psilva.apptest.main.state.PerformanceTestState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,6 +27,7 @@ class MainViewModel : MainBaseObservableViewModel(),
     IPerformanceTestResultListener {
 
     private lateinit var _testTypeSelected: DatabaseOperationTypeEnum
+    private var _performanceTestsState: PerformanceTestState = PerformanceTestState()
     private var _quantityTest: Long = 1
     private var _quantityTestData: Long = 100
     private var _databaseQeue: Queue<DatabaseEnum> = LinkedList()
@@ -67,30 +70,6 @@ class MainViewModel : MainBaseObservableViewModel(),
         _onPerformanceTestListener = performanceTestListener
     }
 
-    suspend fun processPerformanceTests(context: Context) = withContext(Dispatchers.IO){
-
-        _resultDataMap.keys.forEach { _databaseQeue.add(it) }
-
-        withContext(Dispatchers.Main) { _onPerformanceTestListener.onPerformanceTestStart() }
-
-        val queueIterator = _databaseQeue.iterator()
-        while (queueIterator.hasNext()) {
-            val database = queueIterator.next()
-            if(database != null) {
-                when (database) {
-                    DatabaseEnum.ROOM -> { executeRoomTest(context) }
-                    DatabaseEnum.REALM -> { executeRealmTest(context) }
-                    DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
-                    DatabaseEnum.COUCHBASE -> { executeCouchbaseTest(context) }
-                    DatabaseEnum.SQLITE -> { executeSQLiteTest(context) }
-                }
-            }
-            queueIterator.remove()
-        }
-
-        withContext(Dispatchers.Main) { _onPerformanceTestListener.onPerformanceTestEnd() }
-    }
-
     fun submitParameters(quantityTest: Long, quantityTestData: Long, testType: String, databaseList: MutableList<DatabaseEnum>) {
         _quantityTest = quantityTest
         _quantityTestData = quantityTestData
@@ -99,7 +78,8 @@ class MainViewModel : MainBaseObservableViewModel(),
 
         databaseList.forEach {
             if(!_resultDataMap.contains(it)) {
-                _resultDataMap.put(it, ResultDataModel(it, Calendar.getInstance().time, 0,0,0,0))
+                _resultDataMap[it] =
+                    ResultDataModel(it, Calendar.getInstance().time, 0,0,0,0, _testTypeSelected)
             }
         }
         setData()
@@ -127,29 +107,47 @@ class MainViewModel : MainBaseObservableViewModel(),
         return data
     }
 
+    fun onExportCSVClicked(context: Context ) {
+        CSVFile.export(context, _performanceTestsState.getDatabasePerformanceTest())
+    }
+
 
 
     private fun onProcessResult(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, time: Long) {
-        var result = _resultDataMap.get(databaseEnum)
+        val result = _resultDataMap[databaseEnum]
 
-        if(result != null) {
-            when (databaseOperationEnum) {
-                DatabaseOperationEnum.CREATE -> result.databaseLastRunDurationCreate = time
-                DatabaseOperationEnum.READ -> result.databaseLastRunDurationRead = time
-                DatabaseOperationEnum.UPDATE -> result.databaseLastRunDurationUpdate = time
-                DatabaseOperationEnum.DELETE -> result.databaseLastRunDurationDelete = time
-            }
-            result.databaseLastRun = Calendar.getInstance().time
-        }
+        _performanceTestsState.addDatabaseTest(databaseOperationEnum, result, time)
 
         data.postValue(_resultDataMap.values)
     }
 
     private fun onProcessResultError(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, time: Long, exception: Exception) {
-        //TODO
+        _onPerformanceTestListener.onPerformanceTestError(databaseEnum, databaseOperationEnum, exception)
     }
 
+    private suspend fun processPerformanceTests(context: Context) = withContext(Dispatchers.IO){
 
+        _resultDataMap.keys.forEach { _databaseQeue.add(it) }
+
+        withContext(Dispatchers.Main) { _onPerformanceTestListener.onPerformanceTestStart() }
+
+        val queueIterator = _databaseQeue.iterator()
+        while (queueIterator.hasNext()) {
+            val database = queueIterator.next()
+            if(database != null) {
+                when (database) {
+                    DatabaseEnum.ROOM -> { executeRoomTest(context) }
+                    DatabaseEnum.REALM -> { executeRealmTest(context) }
+                    DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
+                    DatabaseEnum.COUCHBASE -> { executeCouchbaseTest(context) }
+                    DatabaseEnum.SQLITE -> { executeSQLiteTest(context) }
+                }
+            }
+            queueIterator.remove()
+        }
+
+        withContext(Dispatchers.Main) { _onPerformanceTestListener.onPerformanceTestEnd() }
+    }
 
     private suspend fun executeRoomTest(context: Context) {
         DataLoaderRoom(context, this).execute(_quantityTestData)
@@ -170,5 +168,4 @@ class MainViewModel : MainBaseObservableViewModel(),
     private suspend fun executeSQLiteTest(context: Context) {
         DataLoaderSqlite(context, this).execute(_quantityTestData)
     }
-
 }
