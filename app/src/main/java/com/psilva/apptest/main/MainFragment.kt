@@ -78,28 +78,9 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
-            AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> _viewModel.onExportCSVClicked(_context)
+            AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> _viewModel.onExportCSVClicked()
         }
     }
-
-
-    private fun requestPermissionToWrite() {
-        //Check permissions
-        val permissionCheck = ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE
-            )
-        } else {
-            // got permission use it
-            _viewModel.onExportCSVClicked(_context)
-        }
-    }
-
-
 
     override fun onPerformanceTestStart() {
         //disable config bottom menu and refresh button
@@ -138,6 +119,17 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     private fun hideProgressBar() {
         _view.pbDatabasesTest.visibility = View.INVISIBLE
         _view.pbDatabasesTest.hide()
+    }
+
+    private fun requestPermissionToWrite() {
+        //Check permissions
+        val permissionCheck = ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
+        } else {
+            // got permission use it
+            _viewModel.onExportCSVClicked()
+        }
     }
 
 
@@ -180,7 +172,6 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     }
 
     private fun bindValues(customView: View) {
-        bindQuantityTest(customView)
         bindQuantityData(customView)
         bindRunTypes(customView)
         bindDatabases(customView)
@@ -193,13 +184,6 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         testRunQtyData.setText(_viewModel.getQuantityTestData().toString())
     }
 
-    // bind quantity tests to do
-    private fun bindQuantityTest(customView: View) {
-        val testRunQty: EditText = customView.findViewById(R.id.etTestRunQty)
-
-        testRunQty.setText(_viewModel.getQuantityTest().toString())
-    }
-
     // bind databases to test
     private fun bindDatabases(customView: View) {
         val cbDatabaseRoomChecked: CheckBox = customView.findViewById(R.id.cbDatabaseRoom)
@@ -207,6 +191,8 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
         val cbDatabaseCouchbaseChecked: CheckBox = customView.findViewById(R.id.cbDatabaseCouchbase)
         val cbDatabaseSQLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseSqlite)
+        val cbDatabaseGreenDaoChecked: CheckBox = customView.findViewById(R.id.cbDatabaseGreenDao)
+        val cbDatabaseObjectBoxChecked: CheckBox = customView.findViewById(R.id.cbDatabaseObjectBox)
 
         _viewModel.getDatabaseListToTest().forEach {
             when(it.key) {
@@ -215,6 +201,8 @@ class MainFragment : Fragment(), IPerformanceTestListener {
                 DatabaseEnum.ORMLITE -> cbDatabaseOrmLiteChecked.isChecked = true
                 DatabaseEnum.COUCHBASE -> cbDatabaseCouchbaseChecked.isChecked = true
                 DatabaseEnum.SQLITE -> cbDatabaseSQLiteChecked.isChecked = true
+                DatabaseEnum.GREEN_DAO -> cbDatabaseGreenDaoChecked.isChecked = true
+                DatabaseEnum.OBJECT_BOX -> cbDatabaseObjectBoxChecked.isChecked = true
             }
         }
     }
@@ -228,7 +216,6 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     }
 
     private fun submitParameters(customView: View) {
-        val testRunQty: EditText = customView.findViewById(R.id.etTestRunQty)
         val testRunQtyData: EditText = customView.findViewById(R.id.etTestRunQtyData)
 
         val testType: Spinner = customView.findViewById(R.id.spTestRunType)
@@ -238,8 +225,12 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         val cbDatabaseOrmLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseOrmLite)
         val cbDatabaseCouchbaseChecked: CheckBox = customView.findViewById(R.id.cbDatabaseCouchbase)
         val cbDatabaseSQLiteChecked: CheckBox = customView.findViewById(R.id.cbDatabaseSqlite)
+        val cbDatabaseGreenDaoChecked: CheckBox = customView.findViewById(R.id.cbDatabaseGreenDao)
+        val cbDatabaseObjectBoxChecked: CheckBox = customView.findViewById(R.id.cbDatabaseObjectBox)
 
 
+        _view.tvQuantityToTest.text = testRunQtyData.text.toString()
+        _view.tvOperationType.text = testType.selectedItem.toString()
 
 
         val databaseList = _viewModel.getDatabaseListToTest()
@@ -263,9 +254,6 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         if(!cbDatabaseRealmChecked.isChecked && databaseList.contains(DatabaseEnum.REALM)) {
             databaseList.remove(DatabaseEnum.REALM)
         }
-
-
-
 
         if(cbDatabaseOrmLiteChecked.isChecked && !databaseList.contains(DatabaseEnum.ORMLITE)) {
             databaseListToAdd.add(DatabaseEnum.ORMLITE)
@@ -294,7 +282,26 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
 
 
-        _viewModel.submitParameters(testRunQty.text.toString().toLong(), testRunQtyData.text.toString().toLong(), testType.selectedItem.toString(), databaseListToAdd)
+        if(cbDatabaseGreenDaoChecked.isChecked && !databaseList.contains(DatabaseEnum.GREEN_DAO)) {
+            databaseListToAdd.add(DatabaseEnum.GREEN_DAO)
+        }
+
+        if(!cbDatabaseGreenDaoChecked.isChecked && databaseList.contains(DatabaseEnum.GREEN_DAO)) {
+            databaseList.remove(DatabaseEnum.GREEN_DAO)
+        }
+
+
+        if(cbDatabaseObjectBoxChecked.isChecked && !databaseList.contains(DatabaseEnum.OBJECT_BOX)) {
+            databaseListToAdd.add(DatabaseEnum.OBJECT_BOX)
+        }
+
+        if(!cbDatabaseObjectBoxChecked.isChecked && databaseList.contains(DatabaseEnum.OBJECT_BOX)) {
+            databaseList.remove(DatabaseEnum.OBJECT_BOX)
+        }
+
+
+
+        _viewModel.submitParameters(testRunQtyData.text.toString().toLong(), testType.selectedItem.toString(), databaseListToAdd)
 
         refreshList()
     }

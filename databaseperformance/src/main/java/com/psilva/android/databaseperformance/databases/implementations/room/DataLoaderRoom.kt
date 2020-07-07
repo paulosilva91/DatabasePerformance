@@ -7,6 +7,7 @@ import com.psilva.android.databaseperformance.databases.Timings
 import com.psilva.android.databaseperformance.databases.implementations.room.entities.DataRoom
 import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationEnum
+import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationTypeEnum
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestResultListener
 
 class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataRoom>() {
@@ -33,7 +34,7 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
         return Timings(TAG)
     }
 
-    public override suspend fun execute(size: Long) {
+    public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         val list: MutableList<DataRoom> = mutableListOf<DataRoom>()
         for (i in 0 until size) {
             list.add(generateData(i))

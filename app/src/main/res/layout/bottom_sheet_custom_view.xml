@@ -17,7 +17,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp">
 
-        <TextView
+        <!--<TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -37,7 +37,7 @@
             android:textColor="?android:textColorPrimary"
             android:textSize="@dimen/bottom_sheet_custom_view_edit"
             android:textAlignment="viewEnd"
-            tools:ignore="Autofill,HardcodedText,LabelFor" />
+            tools:ignore="Autofill,HardcodedText,LabelFor" />-->
 
         <!--<com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
@@ -132,70 +132,100 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:text="Select the databases you want to test"
+        android:text="@string/select_the_databases_message"
         android:textColor="?android:textColorPrimary"
         android:textSize="@dimen/bottom_sheet_custom_view_title"/>
 
-    <RelativeLayout
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp">
+        android:weightSum="2">
 
-        <CheckBox
-            android:id="@+id/cbDatabaseRoom"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="@string/database_name_room"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1">
 
-        <CheckBox
-            android:id="@+id/cbDatabaseRealm"
-            android:layout_width="wrap_content"
+            <CheckBox
+                android:id="@+id/cbDatabaseRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="@string/database_name_room"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+
+            <CheckBox
+                android:id="@+id/cbDatabaseRealm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/cbDatabaseRoom"
+                android:gravity="center"
+                android:text="@string/database_name_realm"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+
+            <CheckBox
+                android:id="@+id/cbDatabaseOrmLite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/cbDatabaseRealm"
+                android:gravity="center"
+                android:text="@string/database_name_ormLite"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+            <CheckBox
+                android:id="@+id/cbDatabaseCouchbase"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/cbDatabaseOrmLite"
+                android:gravity="center"
+                android:text="@string/database_name_couchbase"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/bottom_sheet_custom_view_edit"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/cbDatabaseRoom"
-            android:gravity="center"
-            android:text="@string/database_name_realm"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/bottom_sheet_custom_view_edit" />
-
-        <CheckBox
-            android:id="@+id/cbDatabaseOrmLite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/cbDatabaseRealm"
-            android:gravity="center"
-            android:text="@string/database_name_ormLite"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/bottom_sheet_custom_view_edit" />
-
-        <CheckBox
-            android:id="@+id/cbDatabaseCouchbase"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/cbDatabaseOrmLite"
-            android:gravity="center"
-            android:text="@string/database_name_couchbase"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/bottom_sheet_custom_view_edit" />
-
-        <CheckBox
-            android:id="@+id/cbDatabaseSqlite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/cbDatabaseCouchbase"
-            android:gravity="center"
-            android:text="@string/database_name_sqlite"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/bottom_sheet_custom_view_edit" />
-
-    </RelativeLayout>
-
+            android:layout_weight="1">
+            <CheckBox
+                android:id="@+id/cbDatabaseSqlite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="@string/database_name_sqlite"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+            <CheckBox
+                android:id="@+id/cbDatabaseGreenDao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/cbDatabaseSqlite"
+                android:gravity="center"
+                android:text="@string/database_name_greendao"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+            <CheckBox
+                android:id="@+id/cbDatabaseObjectBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/cbDatabaseGreenDao"
+                android:gravity="center"
+                android:text="@string/database_name_objectbox"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/bottom_sheet_custom_view_edit" />
+        </RelativeLayout>
+    </LinearLayout>
 </LinearLayout>

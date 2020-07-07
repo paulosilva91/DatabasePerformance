@@ -6,7 +6,8 @@
     <string name="database_name_realm">Realm</string>
     <string name="database_name_ormLite">OrmLite</string>
     <string name="database_name_couchbase">Couchbase</string>
-    <string name="database_name_objectBox">Object Box</string>
+    <string name="database_name_objectbox">Object Box</string>
+    <string name="database_name_greendao">GreenDAO</string>
 
     <string name="database_last_date_run">Last Date Run : </string>
     <string name="database_create_time">Create Time (ms) : </string>
@@ -18,9 +19,12 @@
     <string name="database_name_sqlite">SQLite</string>
 
 
-
-
     <string name="database_error_message" formatted="false">An error occurred when testing the %1$s operation in the DB %2$s</string>
     <string name="menu_export_csv">Export CSV</string>
+    <string name="select_the_databases_message">Select the databases you want to test</string>
+    <string name="menu_label">Menu</string>
+    <string name="quantity_data_label">Quantity Data :</string>
+    <string name="operation_type_label">Operation type :</string>
+
 
 </resources>

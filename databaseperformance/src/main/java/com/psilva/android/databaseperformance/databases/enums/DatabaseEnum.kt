@@ -5,5 +5,7 @@ enum class DatabaseEnum {
     REALM,
     ORMLITE,
     COUCHBASE,
-    SQLITE
+    SQLITE,
+    GREEN_DAO,
+    OBJECT_BOX
 }

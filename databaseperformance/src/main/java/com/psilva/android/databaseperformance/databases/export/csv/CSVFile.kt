@@ -11,7 +11,7 @@ class CSVFile {
     companion object {
         private const val CSV_HEADER = "name,databaseOperation,databaseOperationType,duration"
 
-        fun export(context: Context, databaseResultModels: Collection<DatabaseResultModel>) {
+        fun export(databaseResultModels: Collection<DatabaseResultModel>) {
             var fileWriter: FileWriter? = null
 
             try {

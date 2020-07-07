@@ -5,6 +5,7 @@ import com.psilva.android.databaseperformance.databases.BaseLoader
 import com.psilva.android.databaseperformance.databases.Timings
 import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationEnum
+import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationTypeEnum
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestResultListener
 import com.psilva.android.databaseperformance.databases.implementations.realm.entities.DataRealm
 import io.realm.Realm
@@ -63,7 +64,7 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
         return Timings(TAG)
     }
 
-    public override suspend fun execute(size: Long) {
+    public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         var list: MutableList<DataRealm> = ArrayList(size.toInt())
 
         for (i in 0 until size) {

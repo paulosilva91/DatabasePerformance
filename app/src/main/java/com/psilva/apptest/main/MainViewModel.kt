@@ -9,6 +9,8 @@ import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationTypeEnum
 import com.psilva.android.databaseperformance.databases.export.csv.CSVFile
+import com.psilva.android.databaseperformance.databases.implementations.greendao.DataLoaderGreenDao
+import com.psilva.android.databaseperformance.databases.implementations.objectbox.DataLoaderObjectbox
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestListener
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestResultListener
 import com.psilva.android.databaseperformance.databases.implementations.ormlite.DataLoaderOrmLite
@@ -26,10 +28,7 @@ import kotlin.collections.LinkedHashMap
 class MainViewModel : MainBaseObservableViewModel(),
     IPerformanceTestResultListener {
 
-    private lateinit var _testTypeSelected: DatabaseOperationTypeEnum
     private var _performanceTestsState: PerformanceTestState = PerformanceTestState()
-    private var _quantityTest: Long = 1
-    private var _quantityTestData: Long = 100
     private var _databaseQeue: Queue<DatabaseEnum> = LinkedList()
     private lateinit var _onPerformanceTestListener: IPerformanceTestListener
     private var _resultDataMap = LinkedHashMap<DatabaseEnum, ResultDataModel>()
@@ -50,7 +49,7 @@ class MainViewModel : MainBaseObservableViewModel(),
 
 
 
-    fun setData() {
+    private fun setData() {
         data.value = _resultDataMap.values
     }
 
@@ -70,27 +69,24 @@ class MainViewModel : MainBaseObservableViewModel(),
         _onPerformanceTestListener = performanceTestListener
     }
 
-    fun submitParameters(quantityTest: Long, quantityTestData: Long, testType: String, databaseList: MutableList<DatabaseEnum>) {
-        _quantityTest = quantityTest
-        _quantityTestData = quantityTestData
+    fun submitParameters(quantityTestData: Long, testType: String, databaseList: MutableList<DatabaseEnum>) {
 
-        _testTypeSelected = enumValueOf(testType)
+        val testTypeSelected : DatabaseOperationTypeEnum = enumValueOf(testType)
+
+        _performanceTestsState.setQuantityTestToRun(quantityTestData)
+        _performanceTestsState.setDatabaseOperationType(testTypeSelected)
 
         databaseList.forEach {
             if(!_resultDataMap.contains(it)) {
                 _resultDataMap[it] =
-                    ResultDataModel(it, Calendar.getInstance().time, 0,0,0,0, _testTypeSelected)
+                    ResultDataModel(it, null, 0,0,0,0, testTypeSelected)
             }
         }
         setData()
     }
 
-    fun getQuantityTest(): Long {
-        return _quantityTest
-    }
-
     fun getQuantityTestData(): Long {
-        return _quantityTestData
+        return _performanceTestsState.getQuantityTestToRun()
     }
 
     fun getDatabaseListToTest(): LinkedHashMap<DatabaseEnum, ResultDataModel> {
@@ -107,8 +103,8 @@ class MainViewModel : MainBaseObservableViewModel(),
         return data
     }
 
-    fun onExportCSVClicked(context: Context ) {
-        CSVFile.export(context, _performanceTestsState.getDatabasePerformanceTest())
+    fun onExportCSVClicked() {
+        CSVFile.export(_performanceTestsState.getDatabasePerformanceTest())
     }
 
 
@@ -141,6 +137,8 @@ class MainViewModel : MainBaseObservableViewModel(),
                     DatabaseEnum.ORMLITE -> { executeOrmLiteTest(context) }
                     DatabaseEnum.COUCHBASE -> { executeCouchbaseTest(context) }
                     DatabaseEnum.SQLITE -> { executeSQLiteTest(context) }
+                    DatabaseEnum.GREEN_DAO -> { executeGreenDAOTest(context) }
+                    DatabaseEnum.OBJECT_BOX -> { executeObjectBox(context) }
                 }
             }
             queueIterator.remove()
@@ -150,22 +148,30 @@ class MainViewModel : MainBaseObservableViewModel(),
     }
 
     private suspend fun executeRoomTest(context: Context) {
-        DataLoaderRoom(context, this).execute(_quantityTestData)
+        DataLoaderRoom(context, this).execute(_performanceTestsState.getDatabaseOperationType(), _performanceTestsState.getQuantityTestToRun())
     }
 
     private suspend fun executeRealmTest(context: Context) {
-        DataLoaderRealm(context, this).execute(_quantityTestData)
+        DataLoaderRealm(context, this).execute(_performanceTestsState.getDatabaseOperationType(), _performanceTestsState.getQuantityTestToRun())
     }
 
     private suspend fun executeOrmLiteTest(context: Context) {
-        DataLoaderOrmLite(context, this).execute(_quantityTestData)
+        DataLoaderOrmLite(context, this).execute(_performanceTestsState.getDatabaseOperationType(), _performanceTestsState.getQuantityTestToRun())
     }
 
     private suspend fun executeCouchbaseTest(context: Context) {
-        DataLoaderCouchbase(context, this).execute(_quantityTestData)
+        DataLoaderCouchbase(context, this).execute(_performanceTestsState.getDatabaseOperationType(), _performanceTestsState.getQuantityTestToRun())
     }
 
     private suspend fun executeSQLiteTest(context: Context) {
-        DataLoaderSqlite(context, this).execute(_quantityTestData)
+        DataLoaderSqlite(context, this).execute(_performanceTestsState.getDatabaseOperationType(), _performanceTestsState.getQuantityTestToRun())
+    }
+
+    private suspend fun executeObjectBox(context: Context) {
+        DataLoaderObjectbox(context, this).execute(_performanceTestsState.getDatabaseOperationType(), _performanceTestsState.getQuantityTestToRun())
+    }
+
+    private suspend fun executeGreenDAOTest(context: Context) {
+        DataLoaderGreenDao(context, this).execute(_performanceTestsState.getDatabaseOperationType(), _performanceTestsState.getQuantityTestToRun())
     }
 }

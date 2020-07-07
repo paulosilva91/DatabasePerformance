@@ -2,6 +2,7 @@ package com.psilva.android.databaseperformance.databases
 
 import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationEnum
+import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationTypeEnum
 import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceTestResultListener
 import com.psilva.android.databaseperformance.databases.utils.RandomFactory
 
@@ -13,7 +14,7 @@ abstract class BaseLoader<T> {
 
     protected abstract fun createTimingLogger(): Timings
 
-    protected abstract suspend fun execute(size: Long)
+    protected abstract suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long)
 
     lateinit var _databasePerformanceTestResultListener: IPerformanceTestResultListener
 

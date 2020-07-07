@@ -33,7 +33,11 @@ class ListAdapter(context: Context, private val result: LinkedHashMap<DatabaseEn
         val model = result?.values?.elementAt(position)
         if(model != null) {
             holder.database.text = model.database.toString()
-            holder.databaseLastRun.text = model.databaseLastRun.toString("yyyy-MM-dd HH:mm:ss")
+            if(model.databaseLastRun != null) {
+                holder.databaseLastRun.text = model.databaseLastRun!!.toString("yyyy-MM-dd HH:mm:ss")
+            } else {
+                holder.databaseLastRun.text = "0"
+            }
             holder.databaseLastRunDurationCreate.text = model.databaseLastRunDurationCreate.toString()
             holder.databaseLastRunDurationRead.text = model.databaseLastRunDurationRead.toString()
             holder.databaseLastRunDurationUpdate.text = model.databaseLastRunDurationUpdate.toString()
