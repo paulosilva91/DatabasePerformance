@@ -15,9 +15,10 @@ import io.objectbox.BoxStore
 
 class DataLoaderObjectbox(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataObjectBox>() {
 
-    lateinit var _boxStore: BoxStore
-    lateinit var _objectBoxHelper: Box<DataObjectBox>
-    private var _context: Context = context
+    private var quantityData: Long = 0
+    lateinit var boxStore: BoxStore
+    lateinit var objectBoxHelper: Box<DataObjectBox>
+    private var context: Context = context
 
 
     companion object {
@@ -42,6 +43,9 @@ class DataLoaderObjectbox(context: Context, databasePerformanceTestResultListene
 
     public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         val list: MutableList<DataObjectBox> = mutableListOf()
+
+        quantityData = size
+
         for (i in 0 until size) {
             list.add(generateData(i))
         }
@@ -51,7 +55,6 @@ class DataLoaderObjectbox(context: Context, databasePerformanceTestResultListene
         updateData(list)
         deleteData()
 
-
         close()
     }
 
@@ -59,28 +62,27 @@ class DataLoaderObjectbox(context: Context, databasePerformanceTestResultListene
         CREATE_DATA.startTiming()
 
         try {
-            _objectBoxHelper.put(list)
+            objectBoxHelper.put(list)
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, ex)
             return
         }
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, quantityData)
     }
 
     private fun readData() {
         READ_DATA.startTiming()
 
         try {
-            val result = _objectBoxHelper.all
-            val bla = 1
+            val result = objectBoxHelper.all
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, quantityData)
     }
 
     private fun updateData(list: MutableList<DataObjectBox>) {
@@ -92,33 +94,33 @@ class DataLoaderObjectbox(context: Context, databasePerformanceTestResultListene
         UPDATE_DATA.startTiming()
 
         try {
-            _objectBoxHelper.put(list)
+            objectBoxHelper.put(list)
         }
         catch (ex: java.lang.Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, quantityData)
     }
 
     private fun deleteData() {
         DELETE_DATA.startTiming()
 
         try {
-            _objectBoxHelper.removeAll()
+            objectBoxHelper.removeAll()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, quantityData)
     }
 
     private fun initObjectBox() {
-        _boxStore = MyObjectBox.builder().androidContext(_context).build()
-        _objectBoxHelper = _boxStore.boxFor(DataObjectBox::class.java)
+        boxStore = MyObjectBox.builder().androidContext(context).build()
+        objectBoxHelper = boxStore.boxFor(DataObjectBox::class.java)
     }
 
     private fun generateData(index : Long) : DataObjectBox {
@@ -126,7 +128,7 @@ class DataLoaderObjectbox(context: Context, databasePerformanceTestResultListene
     }
 
     private fun close() {
-        _boxStore.close()
-        _boxStore.deleteAllFiles()
+        boxStore.close()
+        boxStore.deleteAllFiles()
     }
 }

@@ -9,7 +9,7 @@ import java.util.*
 
 class CSVFile {
     companion object {
-        private const val CSV_HEADER = "name,databaseOperation,databaseOperationType,duration"
+        private const val CSV_HEADER = "name,databaseOperation,databaseOperationType,quantity,date,duration"
 
         fun export(databaseResultModels: Collection<DatabaseResultModel>) {
             var fileWriter: FileWriter? = null
@@ -26,6 +26,10 @@ class CSVFile {
                     fileWriter.append(item.databaseOperationEnum.toString())
                     fileWriter.append(',')
                     fileWriter.append(item.databaseOperationTypeEnum.toString())
+                    fileWriter.append(',')
+                    fileWriter.append(item.quantityData.toString())
+                    fileWriter.append(',')
+                    fileWriter.append(item.dateTested.toString())
                     fileWriter.append(',')
                     fileWriter.append(item.timeValue.toString())
                     fileWriter.append('\n')

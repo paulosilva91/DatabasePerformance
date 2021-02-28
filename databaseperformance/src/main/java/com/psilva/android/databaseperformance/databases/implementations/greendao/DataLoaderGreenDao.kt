@@ -12,8 +12,9 @@ import java.lang.Exception
 
 class DataLoaderGreenDao(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataGreenDao>() {
 
-    private var _context: Context = context
-    private lateinit var _greenDaoDatabase: GreenDaoDatabaseHelper
+    private var quantityData: Long = 0
+    private var context: Context = context
+    private lateinit var greenDaoDatabase: GreenDaoDatabaseHelper
 
     companion object {
         const val TAG = "GreenDao"
@@ -38,6 +39,8 @@ class DataLoaderGreenDao(context: Context, databasePerformanceTestResultListener
     public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         val list: MutableList<DataGreenDao> = mutableListOf()
 
+        quantityData = size
+
         for(i in 0 until size) {
             list.add(generateData(i))
         }
@@ -46,6 +49,8 @@ class DataLoaderGreenDao(context: Context, databasePerformanceTestResultListener
         readData()
         updateData(list)
         deleteData()
+
+        greenDaoDatabase.close()
     }
 
 
@@ -53,28 +58,28 @@ class DataLoaderGreenDao(context: Context, databasePerformanceTestResultListener
         CREATE_DATA.startTiming()
 
         try {
-            _greenDaoDatabase.insertAll(list)
+            greenDaoDatabase.insertAll(list)
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, quantityData)
     }
 
     private fun readData() {
         READ_DATA.startTiming()
 
         try {
-            val result = _greenDaoDatabase.getAll()
+            val result = greenDaoDatabase.getAll()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, quantityData)
     }
 
     private fun updateData(list: MutableList<DataGreenDao>) {
@@ -86,33 +91,33 @@ class DataLoaderGreenDao(context: Context, databasePerformanceTestResultListener
         UPDATE_DATA.startTiming()
 
         try {
-            _greenDaoDatabase.updateAll(list)
+            greenDaoDatabase.updateAll(list)
         }
         catch (ex: java.lang.Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, quantityData)
     }
 
     private fun deleteData() {
         DELETE_DATA.startTiming()
 
         try {
-            _greenDaoDatabase.deleteAll()
+            greenDaoDatabase.deleteAll()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, quantityData)
     }
 
 
     private fun initGreenDAO() {
-        _greenDaoDatabase = GreenDaoDatabaseHelper(_context)
+        greenDaoDatabase = GreenDaoDatabaseHelper(context)
     }
 
     private fun generateData(index : Long) : DataGreenDao {

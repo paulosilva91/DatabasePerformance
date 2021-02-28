@@ -12,5 +12,6 @@ data class ResultDataModel(
     var databaseLastRunDurationRead: Long = 0,
     var databaseLastRunDurationUpdate: Long = 0,
     var databaseLastRunDurationDelete: Long = 0,
-    var databaseTestType: DatabaseOperationTypeEnum
+    var databaseTestType: DatabaseOperationTypeEnum,
+    var databaseTestQuantityData: Long = 0
 )

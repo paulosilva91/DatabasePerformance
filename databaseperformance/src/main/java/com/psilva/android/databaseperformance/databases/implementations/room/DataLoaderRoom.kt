@@ -12,7 +12,8 @@ import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceT
 
 class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataRoom>() {
 
-    var _room: RoomDatabaseHelper private set
+    private var quantityData: Long = 0
+    var room: RoomDatabaseHelper private set
     private lateinit var _data: Array<DataRoom>
 
 
@@ -22,7 +23,7 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
     }
 
     init {
-        _room = Room.databaseBuilder(context, RoomDatabaseHelper::class.java, "room").build()
+        room = Room.databaseBuilder(context, RoomDatabaseHelper::class.java, "room").build()
         setDatabasePerformanceTestResultListener(databasePerformanceTestResultListener)
     }
 
@@ -36,16 +37,21 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
 
     public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         val list: MutableList<DataRoom> = mutableListOf<DataRoom>()
+
+        quantityData = size
+
         for (i in 0 until size) {
             list.add(generateData(i))
         }
 
-        _room.getDataRoomDao().deleteAll()//TODO
+        room.getDataRoomDao().deleteAll()//TODO
 
         createData(list)
         readData()
         updateData()
         deleteData()
+
+        room.close()
     }
 
 
@@ -54,27 +60,27 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
         CREATE_DATA.startTiming()
 
         try {
-            _room.getDataRoomDao().insertAll(list)
+            room.getDataRoomDao().insertAll(list)
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, ex)
             return
         }
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, quantityData)
     }
 
     private suspend fun readData() {
         READ_DATA.startTiming()
 
         try {
-            _data = _room.getDataRoomDao().getAll()
+            _data = room.getDataRoomDao().getAll()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, quantityData)
     }
 
     private suspend fun updateData() {
@@ -87,28 +93,28 @@ class DataLoaderRoom(context: Context, databasePerformanceTestResultListener: IP
         UPDATE_DATA.startTiming()
 
         try {
-            _room.getDataRoomDao().update(_data.asList())
+            room.getDataRoomDao().update(_data.asList())
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, quantityData)
     }
 
     private suspend fun deleteData() {
         DELETE_DATA.startTiming()
 
         try {
-            _room.getDataRoomDao().deleteAll()
+            room.getDataRoomDao().deleteAll()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, quantityData)
     }
 
     private fun generateData(index : Long) : DataRoom {

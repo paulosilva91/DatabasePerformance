@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.couchbase.lite:couchbase-lite-android-ee:2.6.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e6663b98c20f11a5bd54050442bf8f7d/jetified-couchbase-lite-android-ee-2.6.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e6663b98c20f11a5bd54050442bf8f7d/jetified-couchbase-lite-android-ee-2.6.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e6663b98c20f11a5bd54050442bf8f7d/jetified-couchbase-lite-android-ee-2.6.0/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.couchbase.lite/couchbase-lite-android-ee/2.6.0/1728d9607d060c5c39857fd6547893a15e2d4e4c/couchbase-lite-android-ee-2.6.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.couchbase.lite/couchbase-lite-android-ee/2.6.0/3825f15283fe1eb209db2e9450323ff029428e60/couchbase-lite-android-ee-2.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

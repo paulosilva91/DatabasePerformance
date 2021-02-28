@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Spinner
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -32,8 +31,8 @@ import kotlinx.android.synthetic.main.main_fragment.view.*
 
 class MainFragment : Fragment(), IPerformanceTestListener {
 
-    private lateinit var _adapter: ListAdapter
-    private lateinit var _viewModel : MainViewModel
+    private lateinit var adapter: ListAdapter
+    private lateinit var viewModel : MainViewModel
     private lateinit var _view : View
     private lateinit var _context : Context
 
@@ -47,7 +46,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _view = inflater.inflate(R.layout.main_fragment, container, false)
 
-        _viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         initComponents()
 
@@ -78,7 +77,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
-            AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> _viewModel.onExportCSVClicked()
+            AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> viewModel.onExportCSVClicked()
         }
     }
 
@@ -97,7 +96,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     }
 
     override fun onPerformanceTestError(databaseEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, exception: Exception) {
-        Snackbar.make(_view.rvResultList, String.format(getString(R.string.database_error_message), databaseOperationEnum, databaseEnum), Snackbar.LENGTH_LONG)
+        Snackbar.make(_view.rvResultList, String.format(getString(R.string.database_error_message), databaseOperationEnum, databaseEnum), Snackbar.LENGTH_LONG).show()
     }
 
 
@@ -128,7 +127,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
             requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), AndroidPermissions.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
         } else {
             // got permission use it
-            _viewModel.onExportCSVClicked()
+            viewModel.onExportCSVClicked()
         }
     }
 
@@ -138,20 +137,20 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     private fun initComponents() {
         setHasOptionsMenu(true)
 
-        _view.fbRefreshScan.setOnClickListener { _viewModel.fetchData(_context) }
+        _view.fbRefreshScan.setOnClickListener { viewModel.fetchData(_context) }
 
         _view.bottomAppBar.setNavigationOnClickListener { showBottomSheetMenu() }
 
         _view.rvResultList.layoutManager = LinearLayoutManager(_context)
 
-        _adapter = ListAdapter(_context, _viewModel.getDatabaseListToTest())
-        _view.rvResultList.adapter = _adapter// set adapter
+        adapter = ListAdapter(_context, viewModel.getDatabaseListToTest())
+        _view.rvResultList.adapter = adapter// set adapter
 
         showBottomSheetMenu()
 
-        _viewModel.setPerformanceTestListener(this)
+        viewModel.setPerformanceTestListener(this)
 
-        _viewModel.getData().observe(viewLifecycleOwner, Observer {
+        viewModel.getData().observe(viewLifecycleOwner, Observer {
             refreshList()
         })
     }
@@ -181,7 +180,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     private fun bindQuantityData(customView: View) {
         val testRunQtyData: EditText = customView.findViewById(R.id.etTestRunQtyData)
 
-        testRunQtyData.setText(_viewModel.getQuantityTestData().toString())
+        testRunQtyData.setText(viewModel.getQuantityTestData().toString())
     }
 
     // bind databases to test
@@ -194,7 +193,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         val cbDatabaseGreenDaoChecked: CheckBox = customView.findViewById(R.id.cbDatabaseGreenDao)
         val cbDatabaseObjectBoxChecked: CheckBox = customView.findViewById(R.id.cbDatabaseObjectBox)
 
-        _viewModel.getDatabaseListToTest().forEach {
+        viewModel.getDatabaseListToTest().forEach {
             when(it.key) {
                 DatabaseEnum.ROOM -> cbDatabaseRoomChecked.isChecked = true
                 DatabaseEnum.REALM -> cbDatabaseRealmChecked.isChecked = true
@@ -210,7 +209,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
     // bind test Type
     private fun bindRunTypes(customView: View) {
         val testRunType: Spinner = customView.findViewById(R.id.spTestRunType)
-        val testTypeList = _viewModel.getDatabaseTestTypeList()
+        val testTypeList = viewModel.getDatabaseTestTypeList()
 
         testRunType.adapter = ArrayAdapter(_context, android.R.layout.simple_spinner_item, testTypeList)
     }
@@ -233,7 +232,7 @@ class MainFragment : Fragment(), IPerformanceTestListener {
         _view.tvOperationType.text = testType.selectedItem.toString()
 
 
-        val databaseList = _viewModel.getDatabaseListToTest()
+        val databaseList = viewModel.getDatabaseListToTest()
         val databaseListToAdd = mutableListOf<DatabaseEnum>()
 
 
@@ -301,14 +300,14 @@ class MainFragment : Fragment(), IPerformanceTestListener {
 
 
 
-        _viewModel.submitParameters(testRunQtyData.text.toString().toLong(), testType.selectedItem.toString(), databaseListToAdd)
+        viewModel.submitParameters(testRunQtyData.text.toString().toLong(), testType.selectedItem.toString(), databaseListToAdd)
 
         refreshList()
     }
 
     // method to refresh the list, only notify data set of changes, not need to instantiate a new adapter
     private fun refreshList() {
-        _adapter.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
         _view.rvResultList.adapter!!.notifyDataSetChanged()
     }
 }

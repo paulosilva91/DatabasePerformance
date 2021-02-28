@@ -1,6 +1,7 @@
 package com.psilva.android.databaseperformance.databases.implementations.ormlite
 
 import android.content.Context
+import com.j256.ormlite.table.TableUtils
 import com.psilva.android.databaseperformance.databases.BaseLoader
 import com.psilva.android.databaseperformance.databases.Timings
 import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
@@ -12,8 +13,9 @@ import com.psilva.android.databaseperformance.databases.implementations.ormlite.
 
 class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataOrmLite>() {
 
+    private var quantityData: Long = 0
     private lateinit var _data: MutableList<DataOrmLite>
-    private var _ormLite: DataOrmLiteDao
+    private var ormLite: DataOrmLiteDao
     private var _context: Context = context
 
     companion object {
@@ -22,7 +24,7 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
     }
 
     init {
-        _ormLite = DataOrmLiteDao(OrmLiteDatabaseHelper(_context).connectionSource)
+        ormLite = DataOrmLiteDao(OrmLiteDatabaseHelper(_context).connectionSource)
         setDatabasePerformanceTestResultListener(databasePerformanceTestResultListener)
     }
 
@@ -39,6 +41,9 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
 
     public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         val list: MutableList<DataOrmLite> = mutableListOf<DataOrmLite>()
+
+        quantityData = size
+
         for (i in 0 until size) {
             list.add(generateData(i))
         }
@@ -47,6 +52,8 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
         readData()
         updateData()
         deleteData()
+
+        ormLite.connectionSource.close()
     }
 
 
@@ -55,7 +62,7 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
 
         try {
             for (item in list) {
-                _ormLite.create(item)
+                ormLite.create(item)
             }
         }
         catch (ex: Exception) {
@@ -63,21 +70,21 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, quantityData)
     }
 
     private suspend fun readData() {
         READ_DATA.startTiming()
 
         try {
-            _data = _ormLite.queryForAll()
+            _data = ormLite.queryForAll()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, quantityData)
     }
 
     private suspend fun updateData() {
@@ -91,7 +98,7 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
 
         try {
             for (item in _data) {
-                _ormLite.update(item)
+                ormLite.update(item)
             }
         }
         catch (ex: Exception) {
@@ -99,7 +106,7 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, quantityData)
     }
 
     private suspend fun deleteData() {
@@ -107,7 +114,7 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
 
         try {
             for (item in _data) {
-                _ormLite.delete(item)
+                ormLite.delete(item)
             }
         }
         catch (ex: Exception) {
@@ -115,7 +122,7 @@ class DataLoaderOrmLite(context: Context, databasePerformanceTestResultListener:
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, quantityData)
     }
 
     private fun generateData(index : Long) : DataOrmLite {

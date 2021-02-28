@@ -10,10 +10,9 @@ import kotlin.collections.LinkedHashMap
 class PerformanceTestState() {
     private var _quantityTestToRun: Long = 0
     private lateinit var _databaseOperationTypeEnum: DatabaseOperationTypeEnum
+    private var _testList: MutableList<DatabaseResultModel> = mutableListOf()
 
-    private var _testList: LinkedHashMap<Long, DatabaseResultModel> = LinkedHashMap()
-
-    fun addDatabaseTest(databaseOperationEnum: DatabaseOperationEnum, resultModel: ResultDataModel?, time: Long) {
+    fun addDatabaseTest(databaseOperationEnum: DatabaseOperationEnum, resultModel: ResultDataModel?, quantityData: Long, time: Long) {
         if(resultModel != null) {
             when (databaseOperationEnum) {
                 DatabaseOperationEnum.CREATE -> resultModel.databaseLastRunDurationCreate = time
@@ -22,15 +21,16 @@ class PerformanceTestState() {
                 DatabaseOperationEnum.DELETE -> resultModel.databaseLastRunDurationDelete = time
             }
             resultModel.databaseLastRun = Calendar.getInstance().time
+            resultModel.databaseTestQuantityData = quantityData
 
-            val databaseResultModel = DatabaseResultModel(resultModel.database, databaseOperationEnum, resultModel.databaseTestType, time, resultModel.databaseLastRun!!.time)
+            val databaseResultModel = DatabaseResultModel(resultModel.database, databaseOperationEnum, resultModel.databaseTestType, resultModel.databaseTestQuantityData, time, resultModel.databaseLastRun!!.time)
 
-            _testList[time] = databaseResultModel
+            _testList.add(databaseResultModel)
         }
     }
 
     fun getDatabasePerformanceTest() : Collection<DatabaseResultModel> {
-        return _testList.values
+        return _testList
     }
 
     fun getQuantityTestToRun(): Long {

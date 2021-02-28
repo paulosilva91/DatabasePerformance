@@ -14,12 +14,11 @@ import java.util.*
 import io.realm.kotlin.*
 import java.lang.Exception
 
-class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataRealm>() {
+class DataLoaderRealm(private var context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataRealm>() {
 
-    private var _context: Context = context
-    private lateinit var _results: RealmResults<DataRealm>
-    private lateinit var _realm: Realm
-
+    private var quantityData: Long = 0
+    private lateinit var results: RealmResults<DataRealm>
+    private lateinit var realm: Realm
 
 
     companion object {
@@ -34,19 +33,19 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
     }
 
     private fun initRealm() {
-        Realm.init(_context)
+        Realm.init(context)
         restoreRealmDatabase()
-        _realm = Realm.getDefaultInstance()
+        realm = Realm.getDefaultInstance()
     }
 
     private fun closeRealm() {
-        _realm.close()
+        realm.close()
     }
 
     private fun restoreRealmDatabase() {
-        _realm = Realm.getDefaultInstance()
+        realm = Realm.getDefaultInstance()
         closeRealm()
-        val configuration = _realm.configuration
+        val configuration = realm.configuration
         Realm.deleteRealm(configuration)
     }
 
@@ -67,6 +66,8 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
     public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         var list: MutableList<DataRealm> = ArrayList(size.toInt())
 
+        quantityData = size
+
         for (i in 0 until size) {
             list.add(generateData(i))
         }
@@ -83,25 +84,25 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
         CREATE_DATA.startTiming()
 
         try {
-            _realm.beginTransaction()
-            _realm.insert(list)
-            _realm.commitTransaction()
+            realm.beginTransaction()
+            realm.insert(list)
+            realm.commitTransaction()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, quantityData)
     }
 
     private suspend fun readData() {
         READ_DATA.startTiming()
 
         try {
-            _results = _realm.where<DataRealm>().findAll()
+            results = realm.where<DataRealm>().findAll()
 
-            for (entity in _results) {
+            for (entity in results) {
                 entity.id
                 entity.intValue
                 entity.longValue
@@ -113,7 +114,7 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, quantityData)
     }
 
     private suspend fun updateData(list: MutableList<DataRealm>) {
@@ -125,32 +126,32 @@ class DataLoaderRealm(context: Context, databasePerformanceTestResultListener: I
         UPDATE_DATA.startTiming()
 
         try {
-            _realm.beginTransaction()
-            _realm.insertOrUpdate(list)
-            _realm.commitTransaction()
+            realm.beginTransaction()
+            realm.insertOrUpdate(list)
+            realm.commitTransaction()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, quantityData)
     }
 
     private suspend fun deleteData() {
         DELETE_DATA.startTiming()
 
         try {
-            _realm.beginTransaction()
-            _results.deleteAllFromRealm()
-            _realm.commitTransaction()
+            realm.beginTransaction()
+            results.deleteAllFromRealm()
+            realm.commitTransaction()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, quantityData)
     }
 
     private fun generateData(index : Long) : DataRealm {

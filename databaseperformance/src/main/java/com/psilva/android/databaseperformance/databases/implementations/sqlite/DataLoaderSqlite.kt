@@ -11,9 +11,10 @@ import com.psilva.android.databaseperformance.databases.interfaces.IPerformanceT
 
 class DataLoaderSqlite(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataSqlite>() {
 
-    private lateinit var _data: List<DataSqlite>
-    private lateinit var _sqliteDatabase: SqliteDatabaseHelper
-    private var _context: Context = context
+    private var quantityData: Long = 0
+    private lateinit var data: List<DataSqlite>
+    private lateinit var sqliteDatabase: SqliteDatabaseHelper
+    private var context: Context = context
 
 
 
@@ -39,6 +40,9 @@ class DataLoaderSqlite(context: Context, databasePerformanceTestResultListener: 
 
     public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         val list: MutableList<DataSqlite> = mutableListOf<DataSqlite>()
+
+        quantityData = size
+
         for (i in 0 until size) {
             list.add(generateData(i))
         }
@@ -47,6 +51,8 @@ class DataLoaderSqlite(context: Context, databasePerformanceTestResultListener: 
         readData()
         updateData(list)
         deleteData()
+
+        sqliteDatabase.close()
     }
 
 
@@ -57,27 +63,29 @@ class DataLoaderSqlite(context: Context, databasePerformanceTestResultListener: 
         CREATE_DATA.startTiming()
 
         try {
-            _sqliteDatabase.insertAll(list)
+            sqliteDatabase.insertAll(list)
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, ex)
             return
         }
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, quantityData)
     }
 
     private fun readData() {
+        initSqlite()
         READ_DATA.startTiming()
 
         try {
-            _data = _sqliteDatabase.getAll()
+
+            data = sqliteDatabase.getAll()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, quantityData)
     }
 
     private fun updateData(list: MutableList<DataSqlite>) {
@@ -86,35 +94,37 @@ class DataLoaderSqlite(context: Context, databasePerformanceTestResultListener: 
             entity.intValue = generateInt()
             entity.longValue = generateLong()
         }
+        initSqlite()
         UPDATE_DATA.startTiming()
 
         try {
-            _sqliteDatabase.updateAll(list)
+            sqliteDatabase.updateAll(list)
         }
         catch (ex: java.lang.Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, quantityData)
     }
 
     private fun deleteData() {
+        initSqlite()
         DELETE_DATA.startTiming()
 
         try {
-            _sqliteDatabase.delete()
+            sqliteDatabase.delete()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, ex)
             return
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, quantityData)
     }
 
     private fun initSqlite() {
-        _sqliteDatabase = SqliteDatabaseHelper(_context)
+        sqliteDatabase = SqliteDatabaseHelper(context)
     }
 
     private fun generateData(index : Long) : DataSqlite {

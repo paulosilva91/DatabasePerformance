@@ -1,5 +1,6 @@
 package com.psilva.android.databaseperformance.databases
 
+import android.util.Log
 import com.psilva.android.databaseperformance.databases.enums.DatabaseEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationEnum
 import com.psilva.android.databaseperformance.databases.enums.DatabaseOperationTypeEnum
@@ -43,15 +44,17 @@ abstract class BaseLoader<T> {
         _databasePerformanceTestResultListener = performanceTestResultListener
     }
 
-    protected fun onProcessSuccess(databaseTypeEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum) {
+    protected fun onProcessSuccess(databaseTypeEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, quantityData: Long) {
         _databasePerformanceTestResultListener.onResultTimeSuccess(
             databaseTypeEnum,
             databaseOperationEnum,
+                quantityData,
             stopTiming()
         )
     }
 
     protected fun onProcessError(databaseTypeEnum: DatabaseEnum, databaseOperationEnum: DatabaseOperationEnum, exception: Exception) {
+        Log.e(this.javaClass.name, "Error: ${exception.message}")
         _databasePerformanceTestResultListener.onResultError(
             databaseTypeEnum,
             databaseOperationEnum,

@@ -10,7 +10,7 @@ import com.psilva.android.databaseperformance.databases.implementations.ormlite.
 class OrmLiteDatabaseHelper : OrmLiteSqliteOpenHelper {
 
     companion object {
-        private val db = "ormLite.db"
+        val db = "ormLite.db"
         private val version = 1
     }
 

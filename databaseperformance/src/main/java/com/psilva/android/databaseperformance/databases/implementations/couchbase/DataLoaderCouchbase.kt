@@ -15,9 +15,10 @@ import java.util.*
 
 class DataLoaderCouchbase(context: Context, databasePerformanceTestResultListener: IPerformanceTestResultListener) : BaseLoader<DataCouchbase>() {
 
-    private lateinit var _data: MutableList<Result>
-    private lateinit var _couchdatabase: Database
-    private var _context: Context = context
+    private var quantityData: Long = 0
+    private lateinit var data: MutableList<Result>
+    private lateinit var couchdatabase: Database
+    private var context: Context = context
 
 
     companion object {
@@ -41,6 +42,7 @@ class DataLoaderCouchbase(context: Context, databasePerformanceTestResultListene
 
     public override suspend fun execute(databaseOperationTypeEnum: DatabaseOperationTypeEnum, size: Long) {
         val list: MutableList<MutableDocument> = ArrayList(size.toInt())
+        quantityData = size
 
         for (i in 0 until size) {
             list.add(generateData(i))
@@ -55,9 +57,9 @@ class DataLoaderCouchbase(context: Context, databasePerformanceTestResultListene
     }
 
     private fun initCouchbase() {
-        CouchbaseLite.init(_context)
+        CouchbaseLite.init(context)
 
-        _couchdatabase = Database("couchbase_db", DatabaseConfiguration())
+        couchdatabase = Database("couchbase_db", DatabaseConfiguration())
     }
 
     private fun generateData(index : Long) : MutableDocument {
@@ -69,14 +71,14 @@ class DataLoaderCouchbase(context: Context, databasePerformanceTestResultListene
 
         try {
             for (item in list) {
-                _couchdatabase.save(item)
+                couchdatabase.save(item)
             }
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, ex)
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, quantityData)
     }
 
     private fun readData() {
@@ -84,15 +86,15 @@ class DataLoaderCouchbase(context: Context, databasePerformanceTestResultListene
 
         try {
             val query: Query = QueryBuilder.select(SelectResult.all())
-                .from(database(_couchdatabase))
+                .from(database(couchdatabase))
             val result: ResultSet = query.execute()
-            _data = result.allResults()
+            data = result.allResults()
         }
         catch (ex: Exception) {
-            onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.CREATE, ex)
+            onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, ex)
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.READ, quantityData)
     }
 
     private fun updateData(list: MutableList<MutableDocument>) {
@@ -106,30 +108,30 @@ class DataLoaderCouchbase(context: Context, databasePerformanceTestResultListene
 
         try {
             for (entity in list) {
-                _couchdatabase.save(entity)
+                couchdatabase.save(entity)
             }
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, ex)
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.UPDATE, quantityData)
     }
 
     private fun deleteData() {
         DELETE_DATA.startTiming()
 
         try {
-            _couchdatabase.delete()
+            couchdatabase.delete()
         }
         catch (ex: Exception) {
             onProcessError(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, ex)
         }
 
-        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE)
+        onProcessSuccess(CURRENT_DB_ENUM, DatabaseOperationEnum.DELETE, quantityData)
     }
 
     private fun closeCouchbase() {
-        _couchdatabase.close()
+        couchdatabase.close()
     }
 }
