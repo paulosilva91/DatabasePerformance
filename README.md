@@ -1,16 +1,16 @@
 # DatabasePerformace
 
 ## Screen Startup / Configuration
-| Configuration 1  | Configuration 2 |
-| ------------- | ------------- |
-| <img src="https://github.com/paulosilva91/DatabasePerformace/blob/master/Screens/db_config_1.png">  | <img src="https://github.com/paulosilva91/DatabasePerformace/blob/master/Screens/db_config_2.png">  |
+| Configuration |
+| ------------- |
+| <img src="https://github.com/paulosilva91/DatabasePerformace/blob/master/Screens/PerformanceTesteConfig.png">  |
 
 <br/>
 <br/>
   
-## Screen Test Databases / Results
+## Screen Test Databases / Export Tests
 
-| Test Databases  | Results |
+| Test Databases  | Export Tests  |
 | ------------- | ------------- |
-| <img src="https://github.com/paulosilva91/DatabasePerformace/blob/master/Screens/db_test.png">  | <img src="https://github.com/paulosilva91/DatabasePerformace/blob/master/Screens/db_test_results.png">  |
+| <img src="https://github.com/paulosilva91/DatabasePerformace/blob/master/Screens/PerformanceTesteReport.png">  | <img src="https://github.com/paulosilva91/DatabasePerformace/blob/master/Screens/PerformanceTesteExportCSV.png">  |
 
